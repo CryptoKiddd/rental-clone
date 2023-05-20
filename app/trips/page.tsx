@@ -13,8 +13,8 @@ const TripsPage = async()=>{
         return(
             <EmptyState title='Unauthorized' subTitle='Please Log in' />
         )
-    }ყ
-    ყ
+    }
+    
     const reservations =await getReservations({
         userId: currentUser.id
     })
