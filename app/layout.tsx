@@ -7,6 +7,7 @@ import RentModal from './components/modals/RentModal'
 import ToasterProvider from './components/providers/ToasterProvider'
 import './globals.css'
 import { Nunito } from 'next/font/google'
+import ClientOnly from './components/ClientOnly'
 
 const font = Nunito({ subsets: ['latin'] })
 
@@ -25,12 +26,14 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={font.className}>
-        <ToasterProvider />
-        <SearchModal />
-        <LoginModal />
-        <RegisterModal />
-        <RentModal />
-        <Navbar currentUser={currentUser} />
+      <ClientOnly>
+          <ToasterProvider />
+          <LoginModal />
+          <RegisterModal />
+          <SearchModal />
+          <RentModal />
+          <Navbar currentUser={currentUser} />
+        </ClientOnly>
         <div className="pt-28 pb-20">
 
            {children}

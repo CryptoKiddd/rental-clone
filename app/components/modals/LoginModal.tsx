@@ -1,107 +1,132 @@
-"use client";
+'use client';
 
-import axios from "axios";
-import  {signIn} from 'next-auth/react';
-import { AiFillGithub } from "react-icons/ai";
-import { FcGoogle } from "react-icons/fc";
 import { useCallback, useState } from "react";
-import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
+import { signIn } from 'next-auth/react';
+import { 
+  FieldValues, 
+  SubmitHandler, 
+  useForm
+} from "react-hook-form";
+import { FcGoogle } from "react-icons/fc";
+import { AiFillGithub } from "react-icons/ai";
+import { useRouter } from "next/navigation";
 
 import useRegisterModal from "@/app/hooks/useRegisterModal";
-import Modal from "./Modal";
-import Heading from "../Heading";
-import Input from "../inputs/Input";
-import Button from "../Button";
 import useLoginModal from "@/app/hooks/useLoginModal";
-import { useRouter } from "next/navigation";
+
+import Modal from "./Modal";
+import Input from "../inputs/Input";
+import Heading from "../Heading";
+import Button from "../Button";
+
 const LoginModal = () => {
-  const router = useRouter()
+  const router = useRouter();
+  const loginModal = useLoginModal();
   const registerModal = useRegisterModal();
-  const loginModal = useLoginModal()
-  const [loading, setLoading] = useState(false);
-  const {
-    register,
+  const [isLoading, setIsLoading] = useState(false);
+
+  const { 
+    register, 
     handleSubmit,
-    formState: { errors },
+    formState: {
+      errors,
+    },
   } = useForm<FieldValues>({
     defaultValues: {
-      email: "",
-      password: "",
+      email: '',
+      password: ''
     },
   });
-  const onSubmit: SubmitHandler<FieldValues> = (data) => {
-    setLoading(true);
+  
+  const onSubmit: SubmitHandler<FieldValues> = 
+  (data) => {
+    setIsLoading(true);
 
-   signIn('credentials', {
-    ...data,
-    redirect:false
-   }).then((callback)=>{
-    setLoading(false);
-    if(callback?.ok){
-      toast.success('Logged in successfully');
-      router.refresh();
-      loginModal.onClose()
-    }
-    if(callback?.error){
-      toast.error(callback.error)
-    }
-   })
-  };
-  const toggle = useCallback(()=>{
+    signIn('credentials', { 
+      ...data, 
+      redirect: false,
+    })
+    .then((callback) => {
+      setIsLoading(false);
+
+      if (callback?.ok) {
+        toast.success('Logged in');
+        router.refresh();
+        loginModal.onClose();
+      }
+      
+      if (callback?.error) {
+        toast.error(callback.error);
+      }
+    });
+  }
+
+  const onToggle = useCallback(() => {
     loginModal.onClose();
-    registerModal.onOpen()
+    registerModal.onOpen();
+  }, [loginModal, registerModal])
 
-  },[loginModal,registerModal])
   const bodyContent = (
     <div className="flex flex-col gap-4">
-      <Heading title="Welcome Back" subtitle="Login to Your account" />
+      <Heading
+        title="Welcome back"
+        subtitle="Login to your account!"
+      />
       <Input
-        register={register}
         id="email"
         label="Email"
-        disabled={loading}
+        disabled={isLoading}
+        register={register}  
         errors={errors}
         required
       />
-    
       <Input
-        register={register}
         id="password"
         label="Password"
-        disabled={loading}
+        type="password"
+        disabled={isLoading}
+        register={register}
         errors={errors}
         required
       />
     </div>
-  );
+  )
+
   const footerContent = (
     <div className="flex flex-col gap-4 mt-3">
       <hr />
-      <Button
-        outlined
+      <Button 
+        outlined 
         label="Continue with Google"
         icon={FcGoogle}
-        onClick={() =>signIn('google')}
+        onClick={() => signIn('google')}
       />
-      <Button
+      <Button 
         outlined
         label="Continue with Github"
         icon={AiFillGithub}
         onClick={() => signIn('github')}
       />
-      <div className="text-neutral-500 text-center mt-4 font-light">
-        <div className="flex flex-row items-center justify-center gap-2">
-          <div>First time using Airnb?</div>
-          <div onClick={toggle} className="text-neutral-800 cursor-pointer hover:underline">Create an Acoount</div>
-        </div>
+      <div className="
+      text-neutral-500 text-center mt-4 font-light">
+        <p>First time using Airbnb?
+          <span 
+            onClick={onToggle} 
+            className="
+              text-neutral-800
+              cursor-pointer 
+              hover:underline
+            "
+            > Create an account</span>
+        </p>
       </div>
     </div>
-  );
+  )
 
   return (
     <Modal
-      disabled={loading}
+      disabled={isLoading}
       isOpen={loginModal.isOpen}
       title="Login"
       actionLabel="Continue"
@@ -111,6 +136,6 @@ const LoginModal = () => {
       footer={footerContent}
     />
   );
-};
+}
 
 export default LoginModal;
